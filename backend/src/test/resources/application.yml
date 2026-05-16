@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+  flyway:
+    enabled: false
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  secret: test-secret-key-that-is-at-least-256-bits-long-for-hmac-sha256-testing
+  expiry-ms: 900000
+  refresh-expiry-ms: 604800000
+
+aws:
+  access-key: test
+  secret-key: test
+  s3:
+    bucket: test-bucket
+    region: ap-south-1
+
+razorpay:
+  key-id: rzp_test_placeholder
+  key-secret: placeholder_secret
+
+twilio:
+  enabled: false
+  account-sid: AC_test
+  auth-token: test_token
+  phone-number: +1234567890
