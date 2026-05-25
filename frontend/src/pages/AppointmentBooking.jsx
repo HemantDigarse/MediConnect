@@ -106,7 +106,7 @@ export default function AppointmentBooking() {
         } catch { toast.error('Payment verification failed') }
       },
       prefill: { name: user?.fullName, email: user?.email },
-      theme: { color: '#0F766E' },
+      theme: { color: '#004AC6' },
       modal: { ondismiss: () => toast.error('Payment cancelled') },
     }
     new window.Razorpay(options).open()
@@ -115,31 +115,32 @@ export default function AppointmentBooking() {
   const isDevPayment = appointment?.razorpayOrderId?.startsWith('dev_order_')
 
   if (!doctor) return (
-    <div className="min-h-screen bg-gray-50"><Navbar />
+    <div className="min-h-screen bg-surface"><Navbar />
       <div className="pt-28 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-[#DBE1FF] border-t-[#004AC6] rounded-full animate-spin" />
       </div>
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface">
       <Navbar />
       <div className="pt-24 max-w-3xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Book Appointment</h1>
-        <p className="text-gray-500 mb-8">with Dr. {doctor.fullName} — {doctor.specialty}</p>
+        <h1 className="text-2xl font-bold text-[#131B2E] mb-2">Book Appointment</h1>
+        <p className="text-[#737686] mb-8">with Dr. {doctor.fullName} — {doctor.specialty}</p>
 
         {/* Stepper */}
         <div className="flex items-center mb-8">
           {STEPS.map((s, i) => (
             <div key={s} className="flex items-center flex-1">
               <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm shrink-0 transition-colors ${
-                i < step ? 'bg-teal-700 text-white' : i === step ? 'bg-teal-600 text-white ring-4 ring-teal-100' : 'bg-gray-200 text-gray-500'
-              }`}>
+                i < step ? 'text-white' : i === step ? 'text-white ring-4 ring-[#DBE1FF]' : 'bg-[#E2E7FF] text-[#737686]'
+              }`}
+                style={i <= step ? { background: 'linear-gradient(135deg, #004AC6, #00687A)' } : {}}>
                 {i < step ? <CheckCircle className="w-4 h-4" /> : i + 1}
               </div>
-              <p className={`text-xs font-medium ml-2 hidden sm:block ${i <= step ? 'text-teal-700' : 'text-gray-400'}`}>{s}</p>
-              {i < STEPS.length - 1 && <div className={`flex-1 h-0.5 mx-3 ${i < step ? 'bg-teal-600' : 'bg-gray-200'}`} />}
+              <p className={`text-xs font-medium ml-2 hidden sm:block ${i <= step ? 'text-[#004AC6]' : 'text-[#C3C6D7]'}`}>{s}</p>
+              {i < STEPS.length - 1 && <div className={`flex-1 h-0.5 mx-3 ${i < step ? 'bg-[#004AC6]' : 'bg-[#E2E7FF]'}`} />}
             </div>
           ))}
         </div>
@@ -147,33 +148,35 @@ export default function AppointmentBooking() {
         {/* Step 0 — Slot selection */}
         {step === 0 && (
           <div className="card space-y-5">
-            <h2 className="font-bold text-gray-900">Select Date & Time</h2>
+            <h2 className="font-bold text-[#131B2E]">Select Date & Time</h2>
             <div className="flex gap-2 overflow-x-auto pb-1">
               {dates.map(d => (
                 <button key={d} onClick={() => { setSelectedDate(d); setSelectedSlot(null) }}
-                  className={`shrink-0 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${d === selectedDate ? 'bg-teal-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-teal-50'}`}>
+                  className={`shrink-0 px-4 py-3 rounded-btn text-sm font-semibold transition-all ${d === selectedDate ? 'text-white' : 'bg-[#F2F3FF] text-[#434655] hover:bg-[#EAEdFF]'}`}
+                  style={d === selectedDate ? { background: 'linear-gradient(135deg, #004AC6, #00687A)' } : {}}>
                   <span className="block text-xs">{format(new Date(d), 'EEE')}</span>
                   {format(new Date(d), 'dd MMM')}
                 </button>
               ))}
             </div>
             {slots.length === 0
-              ? <p className="text-center text-gray-400 py-6">No slots available on this date.</p>
+              ? <p className="text-center text-[#C3C6D7] py-6">No slots available on this date.</p>
               : <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                   {slots.map(s => (
                     <button key={s.id} onClick={() => setSelectedSlot(s.id)}
-                      className={`py-3 rounded-xl text-sm font-semibold border-2 transition-all ${
-                        selectedSlot === s.id ? 'bg-teal-700 text-white border-teal-700' : 'border-gray-200 text-gray-700 hover:border-teal-400'
-                      }`}>
+                      className={`py-3 rounded-btn text-sm font-semibold border transition-all ${
+                        selectedSlot === s.id ? 'text-white border-[#004AC6]' : 'border-[#E2E8F0] text-[#434655] hover:border-[#004AC6]'
+                      }`}
+                      style={selectedSlot === s.id ? { background: 'linear-gradient(135deg, #004AC6, #00687A)' } : {}}>
                       <Clock className="w-3.5 h-3.5 mx-auto mb-0.5" />
                       {s.startTime}
                     </button>
                   ))}
                 </div>
             }
-            <div className="bg-teal-50 rounded-xl p-4 flex items-center justify-between">
-              <div><p className="font-semibold text-teal-800">Consultation Fee</p><p className="text-sm text-teal-600">Dr. {doctor.fullName}</p></div>
-              <p className="text-2xl font-extrabold text-teal-700">₹{doctor.consultationFee}</p>
+            <div className="bg-[#F2F3FF] rounded-btn p-4 flex items-center justify-between">
+              <div><p className="font-semibold text-[#004AC6]">Consultation Fee</p><p className="text-sm text-[#434655]">Dr. {doctor.fullName}</p></div>
+              <p className="text-2xl font-extrabold text-[#004AC6]">₹{doctor.consultationFee}</p>
             </div>
             <button onClick={() => { if (!selectedSlot) { toast.error('Select a slot'); return; } setStep(1) }}
               className="btn-primary w-full">Continue →</button>
@@ -183,15 +186,15 @@ export default function AppointmentBooking() {
         {/* Step 1 — Symptoms */}
         {step === 1 && (
           <div className="card space-y-5">
-            <h2 className="font-bold text-gray-900">Describe Your Symptoms</h2>
-            <div className="bg-gray-50 rounded-xl p-4">
+            <h2 className="font-bold text-[#131B2E]">Describe Your Symptoms</h2>
+            <div className="bg-[#F2F3FF] rounded-btn p-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-teal-700" />
+                <div className="w-10 h-10 bg-[#DBE1FF] rounded-btn flex items-center justify-center">
+                  <Calendar className="w-5 h-5 text-[#004AC6]" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-800">{format(new Date(selectedDate), 'dd MMMM yyyy')}</p>
-                  <p className="text-gray-500 text-sm">{slots.find(s => s.id === selectedSlot)?.startTime} — Dr. {doctor.fullName}</p>
+                  <p className="font-semibold text-[#131B2E]">{format(new Date(selectedDate), 'dd MMMM yyyy')}</p>
+                  <p className="text-[#737686] text-sm">{slots.find(s => s.id === selectedSlot)?.startTime} — Dr. {doctor.fullName}</p>
                 </div>
               </div>
             </div>
@@ -214,14 +217,15 @@ export default function AppointmentBooking() {
         {step === 2 && isDevPayment && (
           <div className="card space-y-5">
             <div className="flex items-center justify-between">
-              <h2 className="font-bold text-gray-900">Payment</h2>
-              <div className="flex items-center gap-1 text-green-600 text-xs font-medium bg-green-50 px-2 py-1 rounded-full">
+              <h2 className="font-bold text-[#131B2E]">Payment</h2>
+              <div className="flex items-center gap-1 text-emerald-600 text-xs font-medium bg-emerald-50 px-2 py-1 rounded-badge">
                 <Shield className="w-3 h-3" /> Secure
               </div>
             </div>
 
             {/* Amount Summary */}
-            <div className="bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-2xl p-5">
+            <div className="text-white rounded-card p-5"
+              style={{ background: 'linear-gradient(135deg, #004AC6 0%, #00687A 100%)' }}>
               <p className="text-sm opacity-80">Total Amount</p>
               <p className="text-3xl font-extrabold mt-1">₹{doctor.consultationFee}</p>
               <p className="text-sm opacity-80 mt-2">Consultation with Dr. {doctor.fullName}</p>
@@ -229,30 +233,30 @@ export default function AppointmentBooking() {
 
             {/* Payment Method Selection */}
             <div>
-              <p className="text-sm font-semibold text-gray-700 mb-3">Select Payment Method</p>
+              <p className="text-sm font-semibold text-[#434655] mb-3">Select Payment Method</p>
               <div className="space-y-2">
                 {[
                   { id: 'upi', icon: Smartphone, label: 'UPI', desc: 'Google Pay, PhonePe, Paytm', color: 'text-purple-600 bg-purple-50' },
-                  { id: 'card', icon: CreditCard, label: 'Credit / Debit Card', desc: 'Visa, Mastercard, RuPay', color: 'text-blue-600 bg-blue-50' },
-                  { id: 'netbanking', icon: Building2, label: 'Net Banking', desc: 'All major banks', color: 'text-teal-600 bg-teal-50' },
+                  { id: 'card', icon: CreditCard, label: 'Credit / Debit Card', desc: 'Visa, Mastercard, RuPay', color: 'text-[#004AC6] bg-[#F2F3FF]' },
+                  { id: 'netbanking', icon: Building2, label: 'Net Banking', desc: 'All major banks', color: 'text-[#00687A] bg-[#ACEDFF]/30' },
                 ].map(m => (
                   <button key={m.id} onClick={() => setPaymentMethod(m.id)}
-                    className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
+                    className={`w-full flex items-center gap-4 p-4 rounded-btn border transition-all text-left ${
                       paymentMethod === m.id
-                        ? 'border-teal-600 bg-teal-50/50 shadow-sm'
-                        : 'border-gray-100 hover:border-gray-200 bg-white'
+                        ? 'border-[#004AC6] bg-[#F2F3FF] shadow-level-1'
+                        : 'border-[#E2E8F0] hover:border-[#C3C6D7] bg-white'
                     }`}>
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${m.color}`}>
+                    <div className={`w-10 h-10 rounded-btn flex items-center justify-center shrink-0 ${m.color}`}>
                       <m.icon className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
-                      <p className="font-semibold text-gray-800">{m.label}</p>
-                      <p className="text-xs text-gray-400">{m.desc}</p>
+                      <p className="font-semibold text-[#131B2E]">{m.label}</p>
+                      <p className="text-xs text-[#C3C6D7]">{m.desc}</p>
                     </div>
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      paymentMethod === m.id ? 'border-teal-600' : 'border-gray-300'
+                      paymentMethod === m.id ? 'border-[#004AC6]' : 'border-[#C3C6D7]'
                     }`}>
-                      {paymentMethod === m.id && <div className="w-2.5 h-2.5 bg-teal-600 rounded-full" />}
+                      {paymentMethod === m.id && <div className="w-2.5 h-2.5 bg-[#004AC6] rounded-full" />}
                     </div>
                   </button>
                 ))}
@@ -307,34 +311,34 @@ export default function AppointmentBooking() {
                 : <>Pay ₹{doctor.consultationFee} →</>
               }
             </button>
-            <p className="text-center text-xs text-gray-400">Secured by MediConnect Payment Gateway</p>
+            <p className="text-center text-xs text-[#C3C6D7]">Secured by MediConnect Payment Gateway</p>
           </div>
         )}
 
         {/* Step 2 — Payment (Razorpay - Production) */}
         {step === 2 && !isDevPayment && (
           <div className="card text-center py-12">
-            <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CreditCard className="w-8 h-8 text-teal-700" />
+            <div className="w-16 h-16 bg-[#DBE1FF] rounded-full flex items-center justify-center mx-auto mb-4">
+              <CreditCard className="w-8 h-8 text-[#004AC6]" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Processing Payment</h2>
-            <p className="text-gray-500">Please complete payment in the Razorpay window...</p>
-            <div className="w-8 h-8 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mt-6" />
+            <h2 className="text-xl font-bold text-[#131B2E] mb-2">Processing Payment</h2>
+            <p className="text-[#737686]">Please complete payment in the Razorpay window...</p>
+            <div className="w-8 h-8 border-4 border-[#DBE1FF] border-t-[#004AC6] rounded-full animate-spin mx-auto mt-6" />
           </div>
         )}
 
         {/* Step 3 — Confirmation */}
         {step === 3 && (
           <div className="card text-center py-12">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-10 h-10 text-green-600" />
+            <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-10 h-10 text-emerald-600" />
             </div>
-            <h2 className="text-2xl font-extrabold text-gray-900 mb-2">Appointment Confirmed!</h2>
-            <p className="text-gray-500 mb-6">Your appointment with Dr. {doctor.fullName} is confirmed.<br />You'll receive a reminder 1 hour before.</p>
-            <div className="bg-gray-50 rounded-xl p-4 text-left max-w-xs mx-auto mb-6">
-              <p className="text-sm text-gray-500"><span className="font-semibold text-gray-700">Doctor:</span> Dr. {doctor.fullName}</p>
-              <p className="text-sm text-gray-500 mt-1"><span className="font-semibold text-gray-700">Date:</span> {format(new Date(selectedDate), 'dd MMM yyyy')}</p>
-              <p className="text-sm text-gray-500 mt-1"><span className="font-semibold text-gray-700">Specialty:</span> {doctor.specialty}</p>
+            <h2 className="text-2xl font-extrabold text-[#131B2E] mb-2">Appointment Confirmed!</h2>
+            <p className="text-[#737686] mb-6">Your appointment with Dr. {doctor.fullName} is confirmed.<br />You'll receive a reminder 1 hour before.</p>
+            <div className="bg-[#F2F3FF] rounded-btn p-4 text-left max-w-xs mx-auto mb-6">
+              <p className="text-sm text-[#737686]"><span className="font-semibold text-[#131B2E]">Doctor:</span> Dr. {doctor.fullName}</p>
+              <p className="text-sm text-[#737686] mt-1"><span className="font-semibold text-[#131B2E]">Date:</span> {format(new Date(selectedDate), 'dd MMM yyyy')}</p>
+              <p className="text-sm text-[#737686] mt-1"><span className="font-semibold text-[#131B2E]">Specialty:</span> {doctor.specialty}</p>
             </div>
             <button onClick={() => navigate('/dashboard')} className="btn-primary">Go to Dashboard</button>
           </div>

@@ -177,37 +177,37 @@ export default function VideoConsult() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+    <div className="min-h-screen bg-[#0F172A] flex items-center justify-center">
       <div className="text-center text-white">
-        <div className="w-12 h-12 border-4 border-teal-300 border-t-teal-600 rounded-full animate-spin mx-auto mb-4" />
+        <div className="w-12 h-12 border-4 border-[#B4C5FF] border-t-[#2563EB] rounded-full animate-spin mx-auto mb-4" />
         <p>Starting consultation...</p>
       </div>
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
+    <div className="min-h-screen bg-[#0F172A] flex flex-col">
       {/* Top bar */}
-      <div className="bg-gray-800 px-6 py-3 flex items-center justify-between border-b border-gray-700">
+      <div className="bg-[#1E293B] px-6 py-3 flex items-center justify-between border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className={`w-2.5 h-2.5 rounded-full ${connected ? 'bg-green-400 animate-pulse' : 'bg-yellow-400'}`} />
+          <div className={`w-2.5 h-2.5 rounded-full ${connected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
           <span className="text-white font-semibold text-sm">MediConnect — Video Consultation</span>
           {remoteConn && <span className="badge badge-green text-xs">Connected</span>}
         </div>
-        <button onClick={() => setChatOpen(!chatOpen)} className="text-gray-400 hover:text-white transition-colors">
+        <button onClick={() => setChatOpen(!chatOpen)} className="text-[#737686] hover:text-white transition-colors">
           {chatOpen ? <X className="w-5 h-5" /> : <MessageSquare className="w-5 h-5" />}
         </button>
       </div>
 
       <div className="flex flex-1 overflow-hidden">
         {/* Video area */}
-        <div className="relative flex-1 bg-gray-900">
+        <div className="relative flex-1 bg-[#0F172A]">
           {webrtcError ? (
             <div className="absolute inset-0 flex items-center justify-center text-center p-8">
               <div>
-                <AlertTriangle className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
+                <AlertTriangle className="w-16 h-16 text-amber-400 mx-auto mb-4" />
                 <h2 className="text-white text-xl font-bold mb-2">Video Unavailable</h2>
-                <p className="text-gray-400 mb-4">WebRTC is blocked or your browser doesn't support it.<br />Please switch to a phone consultation.</p>
+                <p className="text-[#737686] mb-4">WebRTC is blocked or your browser doesn't support it.<br />Please switch to a phone consultation.</p>
                 <button onClick={() => navigate('/dashboard')} className="btn-secondary">Return to Dashboard</button>
               </div>
             </div>
@@ -218,23 +218,23 @@ export default function VideoConsult() {
               {!remoteConn && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center text-white">
-                    <div className="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-20 h-20 bg-[#1E293B] rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
                       <span className="text-3xl">👨‍⚕️</span>
                     </div>
                     <p className="font-semibold">Waiting for the other participant...</p>
                     <div className="flex justify-center gap-1 mt-3">
-                      {[0,1,2].map(i => <div key={i} className="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style={{ animationDelay: `${i*0.2}s` }} />)}
+                      {[0,1,2].map(i => <div key={i} className="w-2 h-2 bg-[#2563EB] rounded-full animate-bounce" style={{ animationDelay: `${i*0.2}s` }} />)}
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Local video (pip) */}
-              <div className="absolute bottom-20 right-4 w-36 h-28 rounded-2xl overflow-hidden border-2 border-teal-500 shadow-xl">
+              <div className="absolute bottom-20 right-4 w-36 h-28 rounded-card overflow-hidden border-2 border-[#2563EB] shadow-level-3">
                 <video ref={localVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
                 {camOff && (
-                  <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
-                    <VideoOff className="w-6 h-6 text-gray-400" />
+                  <div className="absolute inset-0 bg-[#1E293B] flex items-center justify-center">
+                    <VideoOff className="w-6 h-6 text-[#737686]" />
                   </div>
                 )}
               </div>
@@ -242,17 +242,17 @@ export default function VideoConsult() {
           )}
 
           {/* Controls */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-gray-800/90 backdrop-blur-sm px-6 py-3 rounded-2xl border border-gray-700">
-            <button onClick={toggleMute} className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${muted ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-600 hover:bg-gray-500'}`}>
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4 glass-dark px-6 py-3 rounded-card">
+            <button onClick={toggleMute} className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${muted ? 'bg-[#BA1A1A] hover:bg-red-700' : 'bg-white/10 hover:bg-white/20'}`}>
               {muted ? <MicOff className="w-5 h-5 text-white" /> : <Mic className="w-5 h-5 text-white" />}
             </button>
-            <button onClick={toggleCamera} className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${camOff ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-600 hover:bg-gray-500'}`}>
+            <button onClick={toggleCamera} className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${camOff ? 'bg-[#BA1A1A] hover:bg-red-700' : 'bg-white/10 hover:bg-white/20'}`}>
               {camOff ? <VideoOff className="w-5 h-5 text-white" /> : <Video className="w-5 h-5 text-white" />}
             </button>
-            <button onClick={endCall} className="w-14 h-11 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center transition-colors shadow-lg">
+            <button onClick={endCall} className="w-14 h-11 bg-[#BA1A1A] hover:bg-red-700 rounded-full flex items-center justify-center transition-colors shadow-level-2">
               <PhoneOff className="w-5 h-5 text-white" />
             </button>
-            <button onClick={() => setChatOpen(!chatOpen)} className="w-11 h-11 bg-gray-600 hover:bg-gray-500 rounded-full flex items-center justify-center transition-colors">
+            <button onClick={() => setChatOpen(!chatOpen)} className="w-11 h-11 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
               <MessageSquare className="w-5 h-5 text-white" />
             </button>
           </div>
@@ -260,36 +260,37 @@ export default function VideoConsult() {
 
         {/* Chat sidebar */}
         {chatOpen && (
-          <div className="w-80 bg-gray-800 flex flex-col border-l border-gray-700">
-            <div className="px-4 py-3 border-b border-gray-700">
+          <div className="w-80 bg-[#1E293B] flex flex-col border-l border-white/10">
+            <div className="px-4 py-3 border-b border-white/10">
               <h3 className="text-white font-semibold text-sm">In-Consultation Chat</h3>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.length === 0 && (
-                <p className="text-gray-500 text-xs text-center mt-8">Messages appear here during the consultation.</p>
+                <p className="text-[#737686] text-xs text-center mt-8">Messages appear here during the consultation.</p>
               )}
               {messages.map((m, i) => (
                 <div key={i} className={`flex flex-col ${m.senderId === user?.id ? 'items-end' : 'items-start'}`}>
                   {m.type === 'JOIN' || m.type === 'LEAVE' ? (
-                    <p className="text-xs text-gray-500 text-center w-full">{m.message}</p>
+                    <p className="text-xs text-[#737686] text-center w-full">{m.message}</p>
                   ) : (
                     <>
-                      <p className="text-xs text-gray-400 mb-1">{m.senderName}</p>
-                      <div className={`max-w-[85%] px-3 py-2 rounded-2xl text-sm ${m.senderId === user?.id ? 'bg-teal-600 text-white rounded-br-sm' : 'bg-gray-700 text-gray-100 rounded-bl-sm'}`}>
+                      <p className="text-xs text-[#737686] mb-1">{m.senderName}</p>
+                      <div className={`max-w-[85%] px-3 py-2 rounded-card text-sm ${m.senderId === user?.id ? 'bg-[#004AC6] text-white rounded-br-sm' : 'bg-white/10 text-gray-100 rounded-bl-sm'}`}>
                         {m.message}
                       </div>
-                      <p className="text-xs text-gray-600 mt-1">{m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</p>
+                      <p className="text-xs text-[#434655] mt-1">{m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</p>
                     </>
                   )}
                 </div>
               ))}
               <div ref={chatEndRef} />
             </div>
-            <div className="p-4 border-t border-gray-700 flex gap-2">
+            <div className="p-4 border-t border-white/10 flex gap-2">
               <input value={msgInput} onChange={e => setMsgInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && sendMessage()}
-                placeholder="Type a message..." className="flex-1 bg-gray-700 text-white text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 placeholder:text-gray-500" />
-              <button onClick={sendMessage} className="w-10 h-10 bg-teal-600 hover:bg-teal-700 rounded-xl flex items-center justify-center transition-colors">
+                placeholder="Type a message..." className="flex-1 bg-white/10 text-white text-sm rounded-btn px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2563EB] placeholder:text-[#737686]" />
+              <button onClick={sendMessage} className="w-10 h-10 rounded-btn flex items-center justify-center transition-colors hover:brightness-110"
+                style={{ background: 'linear-gradient(135deg, #004AC6, #00687A)' }}>
                 <Send className="w-4 h-4 text-white" />
               </button>
             </div>

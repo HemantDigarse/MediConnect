@@ -20,7 +20,7 @@ function App() {
   return (
     <Routes>
       {/* Public */}
-      <Route path="/"          element={<Home />} />
+      <Route path="/"          element={user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />} />
       <Route path="/login"     element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/register"  element={user ? <Navigate to="/dashboard" replace /> : <Register />} />
       <Route path="/forgot-password" element={user ? <Navigate to="/dashboard" replace /> : <ForgotPassword />} />

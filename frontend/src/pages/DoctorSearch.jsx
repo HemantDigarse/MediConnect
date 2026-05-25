@@ -36,22 +36,25 @@ export default function DoctorSearch() {
   const hasFilters   = Object.values(filters).some(v => v !== '')
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface">
       <Navbar />
       <div className="pt-20">
         {/* Hero bar */}
-        <div className="bg-gradient-to-r from-teal-700 to-teal-900 py-10 px-4">
-          <div className="max-w-4xl mx-auto text-center text-white">
+        <div className="py-10 px-4 relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, #004AC6 0%, #00687A 100%)' }}>
+          <div className="absolute inset-0 pointer-events-none opacity-20"
+            style={{ background: 'radial-gradient(circle at 80% 20%, rgba(255,255,255,0.15) 0%, transparent 50%)' }} />
+          <div className="max-w-4xl mx-auto text-center text-white relative z-10">
             <h1 className="text-3xl font-bold mb-2">Find the Right Doctor</h1>
-            <p className="text-teal-200 mb-6">Browse {totalElements || '2,000+'} verified specialists</p>
+            <p className="text-[#B4C5FF] mb-6">Browse {totalElements || '2,000+'} verified specialists</p>
             <form onSubmit={handleSearch} className="flex gap-3 max-w-xl mx-auto">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#737686]" />
                 <input value={searchText} onChange={e => setSearchText(e.target.value)}
                   placeholder="Search specialty or doctor name..."
                   className="input pl-10 w-full" />
               </div>
-              <button type="submit" className="btn-primary !px-6">Search</button>
+              <button type="submit" className="btn-primary !px-6 !shadow-level-2">Search</button>
             </form>
           </div>
         </div>
@@ -63,8 +66,8 @@ export default function DoctorSearch() {
             <aside className={`lg:w-64 shrink-0 space-y-4 ${filtersOpen ? 'block' : 'hidden lg:block'}`}>
               <div className="card">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-gray-900 flex items-center gap-2"><SlidersHorizontal className="w-4 h-4" /> Filters</h3>
-                  {hasFilters && <button onClick={clearFilters} className="text-xs text-teal-600 flex items-center gap-1 hover:text-teal-800"><X className="w-3 h-3" /> Clear</button>}
+                  <h3 className="font-bold text-[#131B2E] flex items-center gap-2"><SlidersHorizontal className="w-4 h-4" /> Filters</h3>
+                  {hasFilters && <button onClick={clearFilters} className="text-xs text-[#004AC6] flex items-center gap-1 hover:text-[#003EA8]"><X className="w-3 h-3" /> Clear</button>}
                 </div>
 
                 <div className="space-y-4">
@@ -110,10 +113,10 @@ export default function DoctorSearch() {
             {/* Results */}
             <div className="flex-1">
               <div className="flex items-center justify-between mb-4">
-                <p className="text-gray-600 text-sm font-medium">
+                <p className="text-[#434655] text-sm font-medium">
                   {loading ? 'Searching...' : `${totalElements || doctors.length} doctors found`}
                 </p>
-                <button onClick={() => setFiltersOpen(!filtersOpen)} className="lg:hidden flex items-center gap-2 text-teal-700 font-medium text-sm">
+                <button onClick={() => setFiltersOpen(!filtersOpen)} className="lg:hidden flex items-center gap-2 text-[#004AC6] font-medium text-sm">
                   <SlidersHorizontal className="w-4 h-4" /> {filtersOpen ? 'Hide' : 'Filters'}
                 </button>
               </div>
@@ -122,7 +125,7 @@ export default function DoctorSearch() {
                 {loading
                   ? Array.from({length:9}).map((_,i) => <CardSkeleton key={i} />)
                   : doctors.length === 0
-                    ? <div className="col-span-3 text-center py-16 text-gray-400">No doctors found. Try different filters.</div>
+                    ? <div className="col-span-3 text-center py-16 text-[#C3C6D7]">No doctors found. Try different filters.</div>
                     : doctors.map(d => <DoctorCard key={d.id} doctor={d} />)
                 }
               </div>
@@ -131,12 +134,12 @@ export default function DoctorSearch() {
               {totalPages > 1 && (
                 <div className="flex items-center justify-center gap-3 mt-8">
                   <button onClick={() => setPage(p => Math.max(0, p-1))} disabled={page === 0}
-                    className="p-2 rounded-xl border-2 border-gray-200 hover:border-teal-400 disabled:opacity-40 transition-colors">
+                    className="p-2 rounded-btn border border-[#E2E8F0] hover:border-[#004AC6] disabled:opacity-40 transition-colors">
                     <ChevronLeft className="w-5 h-5" />
                   </button>
-                  <span className="text-gray-600 font-medium">Page {page+1} of {totalPages}</span>
+                  <span className="text-[#434655] font-medium">Page {page+1} of {totalPages}</span>
                   <button onClick={() => setPage(p => Math.min(totalPages-1, p+1))} disabled={page >= totalPages-1}
-                    className="p-2 rounded-xl border-2 border-gray-200 hover:border-teal-400 disabled:opacity-40 transition-colors">
+                    className="p-2 rounded-btn border border-[#E2E8F0] hover:border-[#004AC6] disabled:opacity-40 transition-colors">
                     <ChevronRight className="w-5 h-5" />
                   </button>
                 </div>

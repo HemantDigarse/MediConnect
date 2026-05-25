@@ -58,27 +58,27 @@ export default function MedicalRecords() {
 
   const fields = [
     { key: 'bloodGroup',          label: 'Blood Group',           placeholder: 'e.g. O+', type: 'text', icon: Heart, color: 'text-red-500' },
-    { key: 'allergies',           label: 'Known Allergies',       placeholder: 'e.g. Penicillin, Pollen', type: 'text', icon: AlertCircle, color: 'text-orange-500' },
+    { key: 'allergies',           label: 'Known Allergies',       placeholder: 'e.g. Penicillin, Pollen', type: 'text', icon: AlertCircle, color: 'text-amber-500' },
     { key: 'chronicConditions',   label: 'Chronic Conditions',    placeholder: 'e.g. Diabetes, Hypertension', type: 'text', icon: Activity, color: 'text-purple-500' },
-    { key: 'currentMedications',  label: 'Current Medications',   placeholder: 'e.g. Metformin 500mg', type: 'text', icon: Pill, color: 'text-blue-500' },
+    { key: 'currentMedications',  label: 'Current Medications',   placeholder: 'e.g. Metformin 500mg', type: 'text', icon: Pill, color: 'text-[#004AC6]' },
   ]
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50"><Navbar />
+    <div className="min-h-screen bg-surface"><Navbar />
       <div className="pt-28 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-[#DBE1FF] border-t-[#004AC6] rounded-full animate-spin" />
       </div>
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface">
       <Navbar />
       <div className="pt-20 max-w-5xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Medical Records</h1>
-            <p className="text-gray-500 mt-1">Your complete health profile and documents</p>
+            <h1 className="text-2xl font-bold text-[#131B2E]">Medical Records</h1>
+            <p className="text-[#737686] mt-1">Your complete health profile and documents</p>
           </div>
           <button onClick={() => editing ? handleSave() : setEditing(true)}
             className={editing ? 'btn-primary' : 'btn-secondary'}>
@@ -90,7 +90,7 @@ export default function MedicalRecords() {
           {/* Health Profile */}
           <div className="lg:col-span-2 space-y-4">
             <div className="card">
-              <h2 className="text-lg font-bold text-gray-900 mb-5 flex items-center gap-2">
+              <h2 className="text-lg font-bold text-[#131B2E] mb-5 flex items-center gap-2">
                 <Heart className="w-5 h-5 text-red-500" /> Health Profile
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -100,7 +100,7 @@ export default function MedicalRecords() {
                     {editing
                       ? <input className="input" placeholder={placeholder} value={form[key] || ''}
                           onChange={e => setForm({ ...form, [key]: e.target.value })} />
-                      : <p className={`text-sm py-2 ${record?.[key] ? 'text-gray-800 font-medium' : 'text-gray-400 italic'}`}>
+                      : <p className={`text-sm py-2 ${record?.[key] ? 'text-[#131B2E] font-medium' : 'text-[#C3C6D7] italic'}`}>
                           {record?.[key] || 'Not specified'}
                         </p>
                     }
@@ -113,7 +113,7 @@ export default function MedicalRecords() {
                   {editing
                     ? <input type="number" className="input" placeholder="170" value={form.heightCm || ''}
                         onChange={e => setForm({ ...form, heightCm: e.target.value })} />
-                    : <p className={`text-sm py-2 ${record?.heightCm ? 'text-gray-800 font-medium' : 'text-gray-400 italic'}`}>
+                    : <p className={`text-sm py-2 ${record?.heightCm ? 'text-[#131B2E] font-medium' : 'text-[#C3C6D7] italic'}`}>
                         {record?.heightCm ? `${record.heightCm} cm` : 'Not specified'}
                       </p>
                   }
@@ -123,14 +123,14 @@ export default function MedicalRecords() {
                   {editing
                     ? <input type="number" className="input" placeholder="70" value={form.weightKg || ''}
                         onChange={e => setForm({ ...form, weightKg: e.target.value })} />
-                    : <p className={`text-sm py-2 ${record?.weightKg ? 'text-gray-800 font-medium' : 'text-gray-400 italic'}`}>
+                    : <p className={`text-sm py-2 ${record?.weightKg ? 'text-[#131B2E] font-medium' : 'text-[#C3C6D7] italic'}`}>
                         {record?.weightKg ? `${record.weightKg} kg` : 'Not specified'}
                       </p>
                   }
                 </div>
               </div>
               {editing && (
-                <div className="flex gap-3 mt-5 pt-4 border-t border-gray-100">
+                <div className="flex gap-3 mt-5 pt-4 border-t border-[#E2E8F0]">
                   <button onClick={() => setEditing(false)} className="btn-secondary flex-1">Cancel</button>
                   <button onClick={handleSave} className="btn-primary flex-1">Save Changes</button>
                 </div>
@@ -140,34 +140,34 @@ export default function MedicalRecords() {
             {/* Lab Reports */}
             <div className="card">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-blue-500" /> Lab Reports
+                <h2 className="text-lg font-bold text-[#131B2E] flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-[#004AC6]" /> Lab Reports
                 </h2>
                 <label className={`btn-secondary text-sm flex items-center gap-2 cursor-pointer ${uploading ? 'opacity-50' : ''}`}>
-                  {uploading ? <><span className="w-4 h-4 border-2 border-teal-300 border-t-teal-600 rounded-full animate-spin" /> Uploading...</>
+                  {uploading ? <><span className="w-4 h-4 border-2 border-[#B4C5FF] border-t-[#004AC6] rounded-full animate-spin" /> Uploading...</>
                     : <><Upload className="w-4 h-4" /> Upload Report</>}
                   <input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png" onChange={handleUpload} disabled={uploading} />
                 </label>
               </div>
               {labReports.length === 0
-                ? <div className="text-center py-8 text-gray-400">
+                ? <div className="text-center py-8 text-[#C3C6D7]">
                     <FileText className="w-10 h-10 mx-auto mb-2 opacity-30" />
                     <p className="text-sm">No lab reports uploaded yet.</p>
                   </div>
                 : <div className="space-y-3">
                     {labReports.map(r => (
-                      <div key={r.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-teal-50 transition-colors">
+                      <div key={r.id} className="flex items-center justify-between p-3 bg-[#F2F3FF] rounded-btn hover:bg-[#EAEdFF] transition-colors">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center">
-                            <FileText className="w-5 h-5 text-blue-600" />
+                          <div className="w-9 h-9 bg-[#DBE1FF] rounded-btn flex items-center justify-center">
+                            <FileText className="w-5 h-5 text-[#004AC6]" />
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-gray-800">{r.reportName}</p>
-                            <p className="text-xs text-gray-400">{format(new Date(r.uploadedAt), 'dd MMM yyyy')}</p>
+                            <p className="text-sm font-semibold text-[#131B2E]">{r.reportName}</p>
+                            <p className="text-xs text-[#C3C6D7]">{format(new Date(r.uploadedAt), 'dd MMM yyyy')}</p>
                           </div>
                         </div>
                         <a href={r.fileUrl} target="_blank" rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 text-teal-600 text-sm font-medium hover:text-teal-800 transition-colors">
+                          className="flex items-center gap-1.5 text-[#004AC6] text-sm font-medium hover:text-[#003EA8] transition-colors">
                           <Download className="w-4 h-4" /> View
                         </a>
                       </div>
@@ -180,7 +180,7 @@ export default function MedicalRecords() {
           {/* Summary card */}
           <div className="space-y-4">
             <div className="card">
-              <h3 className="font-bold text-gray-900 mb-4">Health Summary</h3>
+              <h3 className="font-bold text-[#131B2E] mb-4">Health Summary</h3>
               <div className="space-y-3">
                 {[
                   { label: 'Blood Group',  value: record?.bloodGroup, badge: 'badge-red' },
@@ -188,11 +188,11 @@ export default function MedicalRecords() {
                   { label: 'Weight',       value: record?.weightKg ? `${record.weightKg} kg` : null },
                   { label: 'BMI',          value: record?.heightCm && record?.weightKg ? (record.weightKg / ((record.heightCm / 100) ** 2)).toFixed(1) : null },
                 ].map(({ label, value, badge }) => (
-                  <div key={label} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                    <span className="text-sm text-gray-500">{label}</span>
+                  <div key={label} className="flex items-center justify-between py-2 border-b border-[#F2F3FF] last:border-0">
+                    <span className="text-sm text-[#737686]">{label}</span>
                     {value
-                      ? badge ? <span className={`badge ${badge}`}>{value}</span> : <span className="text-sm font-semibold text-gray-800">{value}</span>
-                      : <span className="text-xs text-gray-300">—</span>
+                      ? badge ? <span className={`badge ${badge}`}>{value}</span> : <span className="text-sm font-semibold text-[#131B2E]">{value}</span>
+                      : <span className="text-xs text-[#C3C6D7]">—</span>
                     }
                   </div>
                 ))}
@@ -200,10 +200,10 @@ export default function MedicalRecords() {
             </div>
 
             <div className="card">
-              <h3 className="font-bold text-gray-900 mb-3">Documents</h3>
+              <h3 className="font-bold text-[#131B2E] mb-3">Documents</h3>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500">Lab Reports</span>
-                <span className="font-bold text-teal-700">{labReports.length}</span>
+                <span className="text-[#737686]">Lab Reports</span>
+                <span className="font-bold text-[#004AC6]">{labReports.length}</span>
               </div>
             </div>
           </div>

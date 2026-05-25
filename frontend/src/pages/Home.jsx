@@ -34,34 +34,41 @@ export default function Home() {
   useEffect(() => { dispatch(searchDoctors({ size: 8 })) }, [dispatch])
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-surface">
       <Navbar />
 
       {/* Hero */}
       <section className="hero-gradient pt-28 pb-20 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          {[...Array(6)].map((_,i) => (
-            <div key={i} className="absolute rounded-full bg-white"
-              style={{ width: 200+i*80, height: 200+i*80, top: `${10+i*15}%`, left: `${-5+i*15}%`, opacity: 0.05+i*0.03 }} />
+        {/* Floating orbs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(5)].map((_,i) => (
+            <div key={i} className="absolute rounded-full animate-float"
+              style={{
+                width: 150+i*100, height: 150+i*100,
+                top: `${5+i*18}%`, left: `${-5+i*20}%`,
+                background: `radial-gradient(circle, rgba(255,255,255,${0.03+i*0.02}) 0%, transparent 70%)`,
+                animationDelay: `${i*1.2}s`
+              }} />
           ))}
         </div>
-        <div className="max-w-6xl mx-auto relative">
+
+        <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-10">
-            <span className="inline-flex items-center gap-2 bg-white/10 text-teal-200 text-sm font-semibold px-4 py-2 rounded-full border border-white/20 mb-6">
+            <span className="inline-flex items-center gap-2 bg-white/10 text-[#B4C5FF] text-sm font-semibold px-4 py-2 rounded-badge border border-white/20 mb-6 backdrop-blur-sm">
               <Stethoscope className="w-4 h-4" /> India's #1 Telemedicine Platform
             </span>
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-6">
+            <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-6" style={{ letterSpacing: '-0.02em' }}>
               Consult Top Doctors<br />
-              <span className="text-teal-300">From Your Home</span>
+              <span className="text-[#57DFFE]">From Your Home</span>
             </h1>
             <p className="text-lg text-white/80 max-w-2xl mx-auto mb-8">
               Book instant video consultations with verified specialists. Get prescriptions, lab reports, and expert care — all in one secure platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/doctors" className="btn-primary bg-white !text-teal-700 hover:bg-teal-50 text-base flex items-center justify-center gap-2">
+              <Link to="/doctors" className="inline-flex items-center justify-center gap-2 bg-white text-[#004AC6] font-bold px-8 py-3.5 rounded-btn hover:bg-[#F2F3FF] transition-all shadow-level-2 text-base">
                 Find a Doctor <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link to="/register" className="btn-secondary !border-white/30 !text-white hover:!bg-white/10 text-base">
+              <Link to="/register" className="inline-flex items-center justify-center gap-2 border border-white/30 text-white font-semibold px-8 py-3.5 rounded-btn hover:bg-white/10 transition-all text-base backdrop-blur-sm">
                 Get Started Free
               </Link>
             </div>
@@ -70,9 +77,9 @@ export default function Home() {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto mt-10">
             {[['50,000+','Patients Served'],['2,000+','Verified Doctors'],['4.9★','Average Rating']].map(([val,label]) => (
-              <div key={label} className="text-center bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+              <div key={label} className="text-center glass-dark rounded-card p-4">
                 <p className="text-2xl font-bold text-white">{val}</p>
-                <p className="text-teal-200 text-xs mt-0.5">{label}</p>
+                <p className="text-[#B4C5FF] text-xs mt-0.5">{label}</p>
               </div>
             ))}
           </div>
@@ -80,15 +87,16 @@ export default function Home() {
       </section>
 
       {/* Specialties */}
-      <section className="py-12 px-4 bg-gray-50">
+      <section className="py-12 px-4 bg-[#F2F3FF]">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-center text-2xl font-bold text-gray-900 mb-6">Browse by Specialty</h2>
+          <h2 className="text-center text-2xl font-bold text-[#131B2E] mb-6">Browse by Specialty</h2>
           <div className="flex flex-wrap justify-center gap-3">
             {specialties.map(s => (
               <button key={s} onClick={() => setActiveSpecialty(activeSpecialty === s ? '' : s)}
-                className={`px-5 py-2.5 rounded-full font-medium text-sm transition-all duration-200 border-2 ${
-                  activeSpecialty === s ? 'bg-teal-700 text-white border-teal-700' : 'bg-white text-gray-600 border-gray-200 hover:border-teal-400 hover:text-teal-700'
-                }`}>
+                className={`px-5 py-2.5 rounded-badge font-medium text-sm transition-all duration-200 border ${
+                  activeSpecialty === s ? 'text-white border-[#004AC6]' : 'bg-white text-[#434655] border-[#E2E8F0] hover:border-[#004AC6] hover:text-[#004AC6]'
+                }`}
+                style={activeSpecialty === s ? { background: 'linear-gradient(135deg, #004AC6, #00687A)', borderColor: '#004AC6' } : {}}>
                 {s}
               </button>
             ))}
@@ -97,14 +105,14 @@ export default function Home() {
       </section>
 
       {/* Top Doctors */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-16 px-4 mesh-bg relative">
+        <div className="max-w-6xl mx-auto relative z-10">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="section-title">Top Doctors</h2>
               <p className="section-subtitle">Verified specialists ready to consult you</p>
             </div>
-            <Link to="/doctors" className="flex items-center gap-2 text-teal-700 font-semibold hover:gap-3 transition-all">
+            <Link to="/doctors" className="flex items-center gap-2 text-[#004AC6] font-semibold hover:gap-3 transition-all">
               View All <ChevronRight className="w-5 h-5" />
             </Link>
           </div>
@@ -118,7 +126,7 @@ export default function Home() {
       </section>
 
       {/* How it Works */}
-      <section className="py-16 px-4 bg-gradient-to-br from-teal-50 to-blue-50">
+      <section className="py-16 px-4 bg-gradient-to-br from-[#F2F3FF] to-[#EAEDFF]">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="section-title">How It Works</h2>
@@ -127,12 +135,13 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {steps.map((s, i) => (
               <div key={i} className="relative text-center">
-                <div className="w-16 h-16 bg-teal-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <div className="w-16 h-16 rounded-card flex items-center justify-center mx-auto mb-4 shadow-level-2"
+                  style={{ background: 'linear-gradient(135deg, #004AC6 0%, #00687A 100%)' }}>
                   <span className="text-white font-extrabold text-lg">{s.step}</span>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{s.title}</h3>
-                <p className="text-gray-500 text-sm">{s.desc}</p>
-                {i < 3 && <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-teal-200 -z-10" style={{width:'calc(100% - 4rem)', left:'calc(50% + 2rem)'}} />}
+                <h3 className="font-bold text-[#131B2E] mb-2">{s.title}</h3>
+                <p className="text-[#737686] text-sm">{s.desc}</p>
+                {i < 3 && <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-[#DBE1FF] -z-10" style={{width:'calc(100% - 4rem)', left:'calc(50% + 2rem)'}} />}
               </div>
             ))}
           </div>
@@ -140,20 +149,21 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-16 px-4 mesh-bg relative">
+        <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-12">
             <h2 className="section-title">Why Choose MediConnect?</h2>
             <p className="section-subtitle">Everything you need for world-class healthcare at home</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="card hover:-translate-y-1 transition-all duration-300">
-                <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-700 rounded-2xl flex items-center justify-center mb-4 shadow-sm">
+              <div key={title} className="card hover:-translate-y-1 hover:scale-[1.01] transition-all duration-300">
+                <div className="w-12 h-12 rounded-card flex items-center justify-center mb-4 shadow-level-1"
+                  style={{ background: 'linear-gradient(135deg, #004AC6 0%, #2563EB 100%)' }}>
                   <Icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
+                <h3 className="font-bold text-[#131B2E] mb-2">{title}</h3>
+                <p className="text-[#737686] text-sm leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
@@ -161,11 +171,13 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4 bg-gray-900">
-        <div className="max-w-3xl mx-auto text-center">
+      <section className="py-16 px-4 bg-[#0F172A] relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(0,74,198,0.2) 0%, transparent 70%)' }} />
+        <div className="max-w-3xl mx-auto text-center relative z-10">
           <h2 className="text-3xl font-extrabold text-white mb-4">Ready to consult a doctor?</h2>
-          <p className="text-gray-400 mb-8">Join 50,000+ patients who trust MediConnect for their healthcare needs.</p>
-          <Link to="/register" className="btn-primary bg-teal-600 hover:bg-teal-500 text-base inline-flex items-center gap-2">
+          <p className="text-[#737686] mb-8">Join 50,000+ patients who trust MediConnect for their healthcare needs.</p>
+          <Link to="/register" className="btn-primary text-base inline-flex items-center gap-2">
             Start for Free <ArrowRight className="w-5 h-5" />
           </Link>
         </div>

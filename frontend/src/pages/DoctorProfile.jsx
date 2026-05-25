@@ -47,49 +47,52 @@ export default function DoctorProfile() {
 
   if (loading) return <PageLoader />
   if (!doctor) return (
-    <div className="min-h-screen flex items-center justify-center text-gray-500">Doctor not found.</div>
+    <div className="min-h-screen flex items-center justify-center text-[#737686]">Doctor not found.</div>
   )
 
   const initials = doctor.fullName?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface">
       <Navbar />
       <div className="pt-20">
         {/* Header */}
-        <div className="bg-gradient-to-r from-teal-700 to-teal-900 py-12 px-4">
-          <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center md:items-start gap-6">
-            <div className="w-28 h-28 rounded-3xl bg-white/20 border-4 border-white/30 flex items-center justify-center text-white font-extrabold text-4xl shadow-xl shrink-0">
+        <div className="py-12 px-4 relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, #004AC6 0%, #00687A 100%)' }}>
+          <div className="absolute inset-0 pointer-events-none opacity-20"
+            style={{ background: 'radial-gradient(circle at 80% 20%, rgba(255,255,255,0.15) 0%, transparent 50%)' }} />
+          <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center md:items-start gap-6 relative z-10">
+            <div className="w-28 h-28 rounded-card bg-white/20 border-4 border-white/30 flex items-center justify-center text-white font-extrabold text-4xl shadow-level-3 shrink-0 backdrop-blur-sm">
               {doctor.profileImageUrl
-                ? <img src={doctor.profileImageUrl} alt={doctor.fullName} className="w-full h-full object-cover rounded-3xl" />
+                ? <img src={doctor.profileImageUrl} alt={doctor.fullName} className="w-full h-full object-cover rounded-card" />
                 : initials
               }
             </div>
             <div className="text-center md:text-left text-white flex-1">
               <h1 className="text-3xl font-extrabold mb-1">Dr. {doctor.fullName}</h1>
-              <p className="text-teal-200 text-lg mb-3">{doctor.specialty}</p>
+              <p className="text-[#B4C5FF] text-lg mb-3">{doctor.specialty}</p>
               <div className="flex flex-wrap justify-center md:justify-start gap-3 text-sm">
                 {doctor.city && (
-                  <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full">
+                  <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-badge backdrop-blur-sm">
                     <MapPin className="w-4 h-4" />{doctor.city}
                   </span>
                 )}
-                <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full">
+                <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-badge backdrop-blur-sm">
                   <Award className="w-4 h-4" />{doctor.experienceYears} yrs exp
                 </span>
-                <span className="flex items-center gap-1.5 bg-amber-400/20 border border-amber-400/30 px-3 py-1.5 rounded-full">
+                <span className="flex items-center gap-1.5 bg-amber-400/20 border border-amber-400/30 px-3 py-1.5 rounded-badge">
                   <Star className="w-4 h-4 text-amber-300 fill-amber-300" />
                   {doctor.rating?.toFixed(1)} ({doctor.reviewCount} reviews)
                 </span>
               </div>
             </div>
-            <div className="text-center bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-6 py-4 text-white shrink-0">
+            <div className="text-center glass-dark rounded-card px-6 py-4 text-white shrink-0">
               <p className="text-3xl font-extrabold">₹{doctor.consultationFee}</p>
-              <p className="text-teal-200 text-sm mb-3">per consultation</p>
+              <p className="text-[#B4C5FF] text-sm mb-3">per consultation</p>
               {user?.role === 'PATIENT'
-                ? <Link to={`/book/${doctor.id}`} className="block bg-white text-teal-700 font-bold py-2.5 px-6 rounded-xl hover:bg-teal-50 transition-colors text-sm">Book Now</Link>
+                ? <Link to={`/book/${doctor.id}`} className="block bg-white text-[#004AC6] font-bold py-2.5 px-6 rounded-btn hover:bg-[#F2F3FF] transition-colors text-sm">Book Now</Link>
                 : !user
-                  ? <Link to="/login" className="block bg-white text-teal-700 font-bold py-2.5 px-6 rounded-xl hover:bg-teal-50 transition-colors text-sm">Sign in to Book</Link>
+                  ? <Link to="/login" className="block bg-white text-[#004AC6] font-bold py-2.5 px-6 rounded-btn hover:bg-[#F2F3FF] transition-colors text-sm">Sign in to Book</Link>
                   : null
               }
             </div>
@@ -102,27 +105,27 @@ export default function DoctorProfile() {
             <div className="lg:col-span-2 space-y-6">
               {doctor.bio && (
                 <div className="card">
-                  <h2 className="text-lg font-bold text-gray-900 mb-3">About Dr. {doctor.fullName}</h2>
-                  <p className="text-gray-600 leading-relaxed">{doctor.bio}</p>
+                  <h2 className="text-lg font-bold text-[#131B2E] mb-3">About Dr. {doctor.fullName}</h2>
+                  <p className="text-[#434655] leading-relaxed">{doctor.bio}</p>
                 </div>
               )}
 
               {/* Reviews */}
               <div className="card">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">Patient Reviews</h2>
+                <h2 className="text-lg font-bold text-[#131B2E] mb-4">Patient Reviews</h2>
                 {reviews.length === 0
-                  ? <p className="text-center text-gray-400 text-sm py-6">No reviews yet.</p>
+                  ? <p className="text-center text-[#C3C6D7] text-sm py-6">No reviews yet.</p>
                   : reviews.map(r => (
-                    <div key={r.id} className="py-4 border-b border-gray-50 last:border-0">
+                    <div key={r.id} className="py-4 border-b border-[#F2F3FF] last:border-0">
                       <div className="flex items-center gap-2 mb-1">
                         <div className="flex">
                           {Array.from({ length: 5 }).map((_, i) => (
-                            <Star key={i} className={`w-4 h-4 ${i < r.rating ? 'text-amber-400 fill-amber-400' : 'text-gray-200'}`} />
+                            <Star key={i} className={`w-4 h-4 ${i < r.rating ? 'text-amber-400 fill-amber-400' : 'text-[#E2E7FF]'}`} />
                           ))}
                         </div>
-                        <span className="text-xs text-gray-400 ml-1">{format(new Date(r.createdAt), 'dd MMM yyyy')}</span>
+                        <span className="text-xs text-[#C3C6D7] ml-1">{format(new Date(r.createdAt), 'dd MMM yyyy')}</span>
                       </div>
-                      {r.comment && <p className="text-gray-600 text-sm mt-1">{r.comment}</p>}
+                      {r.comment && <p className="text-[#434655] text-sm mt-1">{r.comment}</p>}
                     </div>
                   ))
                 }
@@ -131,15 +134,16 @@ export default function DoctorProfile() {
 
             {/* Slot picker */}
             <div className="card h-fit">
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-teal-600" /> Available Slots
+              <h2 className="text-lg font-bold text-[#131B2E] mb-4 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-[#004AC6]" /> Available Slots
               </h2>
               <div className="flex gap-1.5 overflow-x-auto pb-2 mb-4">
                 {dates.map(d => (
                   <button key={d} onClick={() => setSelectedDate(d)}
-                    className={`shrink-0 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-                      d === selectedDate ? 'bg-teal-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-700'
-                    }`}>
+                    className={`shrink-0 px-3 py-2 rounded-btn text-xs font-semibold transition-all ${
+                      d === selectedDate ? 'text-white' : 'bg-[#F2F3FF] text-[#434655] hover:bg-[#EAEdFF] hover:text-[#004AC6]'
+                    }`}
+                    style={d === selectedDate ? { background: 'linear-gradient(135deg, #004AC6, #00687A)' } : {}}>
                     <span className="block">{format(new Date(d), 'EEE')}</span>
                     <span className="block">{format(new Date(d), 'dd')}</span>
                   </button>
@@ -148,16 +152,16 @@ export default function DoctorProfile() {
 
               {slotsLoading ? (
                 <div className="grid grid-cols-2 gap-2">
-                  {[1,2,3,4].map(i => <div key={i} className="h-10 skeleton rounded-xl" />)}
+                  {[1,2,3,4].map(i => <div key={i} className="h-10 skeleton rounded-btn" />)}
                 </div>
               ) : slots.length === 0 ? (
-                <p className="text-center text-gray-400 text-sm py-6">No available slots on this date.</p>
+                <p className="text-center text-[#C3C6D7] text-sm py-6">No available slots on this date.</p>
               ) : (
                 <div className="grid grid-cols-2 gap-2 mb-4">
                   {slots.map(s => (
                     <Link key={s.id}
                       to={user ? `/book/${doctor.id}?slotId=${s.id}&date=${selectedDate}` : '/login'}
-                      className="text-center py-2.5 rounded-xl bg-teal-50 text-teal-700 text-sm font-semibold hover:bg-teal-100 transition-colors border border-teal-100">
+                      className="text-center py-2.5 rounded-btn bg-[#F2F3FF] text-[#004AC6] text-sm font-semibold hover:bg-[#DBE1FF] transition-colors border border-[#E2E7FF]">
                       {s.startTime}
                     </Link>
                   ))}
