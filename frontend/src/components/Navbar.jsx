@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { logout } from '../store/slices/authSlice'
-import { Bell, Menu, X, Heart, ChevronDown, User, LogOut, LayoutDashboard, FileText } from 'lucide-react'
+import { Bell, Menu, X, Heart, ChevronDown, User, LogOut, LayoutDashboard, FileText, Bot } from 'lucide-react'
 
 export default function Navbar() {
   const { user } = useSelector(s => s.auth)
@@ -40,6 +40,9 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-1">
             <Link to="/" className={`nav-link ${isActive('/') ? 'nav-link-active' : ''}`}>Home</Link>
             <Link to="/doctors" className={`nav-link ${isActive('/doctors') ? 'nav-link-active' : ''}`}>Find Doctors</Link>
+            {user && user.role !== 'ADMIN' && (
+              <Link to="/medi-bot" className={`nav-link ${isActive('/medi-bot') ? 'nav-link-active' : ''}`}>Medi Bot</Link>
+            )}
             {user && (
               <Link to={dashboardLink} className={`nav-link ${location.pathname.includes('dashboard') || location.pathname === '/admin' ? 'nav-link-active' : ''}`}>Dashboard</Link>
             )}
@@ -85,6 +88,12 @@ export default function Navbar() {
                           <FileText className="w-4 h-4" /> Medical Records
                         </Link>
                       )}
+                      {user.role !== 'ADMIN' && (
+                        <Link to="/medi-bot" onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 text-[#434655] hover:bg-[#F2F3FF] hover:text-[#004AC6] transition-colors text-sm">
+                          <Bot className="w-4 h-4" /> MediConnect Bot
+                        </Link>
+                      )}
                       <button onClick={handleLogout}
                         className="flex items-center gap-3 px-4 py-2.5 text-[#BA1A1A] hover:bg-red-50 transition-colors text-sm w-full">
                         <LogOut className="w-4 h-4" /> Sign Out
@@ -116,6 +125,7 @@ export default function Navbar() {
           {user ? (
             <>
               <Link to={dashboardLink} className="block nav-link" onClick={() => setMobileOpen(false)}>Dashboard</Link>
+              {user.role !== 'ADMIN' && <Link to="/medi-bot" className="block nav-link" onClick={() => setMobileOpen(false)}>Medi Bot</Link>}
               <button onClick={handleLogout} className="block w-full text-left nav-link text-[#BA1A1A]">Sign Out</button>
             </>
           ) : (

@@ -29,6 +29,33 @@ export const register = createAsyncThunk('auth/register', async (data, { rejectW
   }
 })
 
+export const verifyOtp = createAsyncThunk('auth/verifyOtp', async ({ email, otp }, { rejectWithValue }) => {
+  try {
+    await api.post('/auth/verify-otp', { email, otp })
+    return { email }
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || 'OTP verification failed')
+  }
+})
+
+export const resendOtp = createAsyncThunk('auth/resendOtp', async (email, { rejectWithValue }) => {
+  try {
+    await api.post(`/auth/resend-otp?email=${encodeURIComponent(email)}`)
+    return email
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || 'Could not resend OTP')
+  }
+})
+
+export const validateEmail = createAsyncThunk('auth/validateEmail', async (email, { rejectWithValue }) => {
+  try {
+    const res = await api.get(`/auth/validate-email?email=${encodeURIComponent(email)}`)
+    return res.data.data
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || 'Could not validate email')
+  }
+})
+
 const persist = (user, access, refresh) => {
   localStorage.setItem('user',         JSON.stringify(user))
   localStorage.setItem('accessToken',  access)
@@ -76,6 +103,20 @@ const authSlice = createSlice({
         toast.success('Account created! Please verify your email.')
       })
       .addCase(register.rejected, (state, { payload }) => { state.loading = false; state.error = payload; toast.error(payload) })
+
+      .addCase(verifyOtp.pending, s => { s.loading = true; s.error = null })
+      .addCase(verifyOtp.fulfilled, (state) => {
+        state.loading = false
+        if (state.user) {
+          state.user.isVerified = true
+          localStorage.setItem('user', JSON.stringify(state.user))
+        }
+        toast.success('Email verified successfully.')
+      })
+      .addCase(verifyOtp.rejected, (state, { payload }) => { state.loading = false; state.error = payload; toast.error(payload) })
+
+      .addCase(resendOtp.fulfilled, () => { toast.success('Verification OTP sent.') })
+      .addCase(resendOtp.rejected, (state, { payload }) => { state.error = payload; toast.error(payload) })
   },
 })
 

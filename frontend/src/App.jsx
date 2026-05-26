@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import VerifyEmail from './pages/VerifyEmail'
 import ForgotPassword from './pages/ForgotPassword'
 import PatientDashboard from './pages/PatientDashboard'
 import DoctorDashboard from './pages/DoctorDashboard'
@@ -11,18 +12,23 @@ import DoctorProfile from './pages/DoctorProfile'
 import AppointmentBooking from './pages/AppointmentBooking'
 import VideoConsult from './pages/VideoConsult'
 import MedicalRecords from './pages/MedicalRecords'
+import MediConnectBot from './pages/MediConnectBot'
 import AdminPanel from './pages/AdminPanel'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
   const { user } = useSelector(state => state.auth)
+  const homeRoute = user
+    ? (!user.isVerified && user.role !== 'ADMIN' ? '/verify-email' : '/dashboard')
+    : '/login'
 
   return (
     <Routes>
       {/* Public */}
-      <Route path="/"          element={user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />} />
-      <Route path="/login"     element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
-      <Route path="/register"  element={user ? <Navigate to="/dashboard" replace /> : <Register />} />
+      <Route path="/"          element={<Navigate to={homeRoute} replace />} />
+      <Route path="/login"     element={user ? <Navigate to={homeRoute} replace /> : <Login />} />
+      <Route path="/register"  element={user ? <Navigate to={homeRoute} replace /> : <Register />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/forgot-password" element={user ? <Navigate to="/dashboard" replace /> : <ForgotPassword />} />
       <Route path="/doctors"   element={<DoctorSearch />} />
       <Route path="/doctors/:id" element={<DoctorProfile />} />
@@ -36,6 +42,9 @@ function App() {
       } />
       <Route path="/records" element={
         <ProtectedRoute roles={['PATIENT']}><MedicalRecords /></ProtectedRoute>
+      } />
+      <Route path="/medi-bot" element={
+        <ProtectedRoute roles={['PATIENT','DOCTOR']}><MediConnectBot /></ProtectedRoute>
       } />
 
       {/* Doctor */}

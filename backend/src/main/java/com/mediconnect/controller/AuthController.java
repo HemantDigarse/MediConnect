@@ -45,6 +45,19 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(null, "Email verified successfully"));
     }
 
+    @PostMapping("/resend-otp")
+    @Operation(summary = "Resend email verification OTP")
+    public ResponseEntity<ApiResponse<Void>> resendOtp(@RequestParam String email) {
+        authService.resendOtp(email);
+        return ResponseEntity.ok(ApiResponse.success(null, "Verification OTP sent"));
+    }
+
+    @GetMapping("/validate-email")
+    @Operation(summary = "Check email format, domain, and availability")
+    public ResponseEntity<ApiResponse<EmailValidationResponse>> validateEmail(@RequestParam String email) {
+        return ResponseEntity.ok(ApiResponse.success(authService.validateEmail(email)));
+    }
+
     @PostMapping("/forgot-password")
     @Operation(summary = "Request password reset link")
     public ResponseEntity<ApiResponse<String>> forgotPassword(@RequestParam String email) {

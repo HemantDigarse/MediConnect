@@ -2,23 +2,40 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useForm } from 'react-hook-form'
+import api from '../api/axiosInstance'
 import { register as registerUser } from '../store/slices/authSlice'
-import { Heart, Eye, EyeOff, User, Mail, Lock, Phone, Stethoscope } from 'lucide-react'
+import { Heart, Eye, EyeOff, User, Mail, Lock, Phone, Stethoscope, CheckCircle, AlertCircle } from 'lucide-react'
 
 export default function Register() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { loading } = useSelector(s => s.auth)
   const [role, setRole] = useState('PATIENT')
-  const { register, handleSubmit, watch, formState: { errors } } = useForm({ defaultValues: { role: 'PATIENT' } })
+  const { register, handleSubmit, formState: { errors } } = useForm({ defaultValues: { role: 'PATIENT' } })
   const [showPwd, setShowPwd] = useState(false)
+  const [emailStatus, setEmailStatus] = useState(null)
+
+  const checkEmail = async (email) => {
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      setEmailStatus(null)
+      return
+    }
+    setEmailStatus({ loading: true, message: 'Checking email...' })
+    try {
+      const res = await api.get(`/auth/validate-email?email=${encodeURIComponent(email)}`)
+      setEmailStatus(res.data.data)
+    } catch {
+      setEmailStatus({ validFormat: false, available: false, domainReachable: false, message: 'Could not check email right now.' })
+    }
+  }
 
   const onSubmit = async (data) => {
-    const payload = { ...data, role }
+    const payload = Object.fromEntries(
+      Object.entries({ ...data, role }).filter(([, value]) => value !== '' && value !== null && value !== undefined && !Number.isNaN(value))
+    )
     const result = await dispatch(registerUser(payload))
     if (registerUser.fulfilled.match(result)) {
-      if (role === 'DOCTOR') navigate('/doctor/dashboard')
-      else navigate('/dashboard')
+      navigate('/verify-email', { state: { email: result.payload.email } })
     }
   }
 
@@ -68,9 +85,21 @@ export default function Register() {
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#737686]" />
                   <input id="email" type="email" placeholder="you@email.com" className={`input pl-10 ${errors.email?'input-error':''}`}
-                    {...register('email',{required:'Email required',pattern:{value:/^\S+@\S+$/,message:'Invalid email'}})} />
+                    {...register('email',{
+                      required:'Email required',
+                      pattern:{value:/^\S+@\S+\.\S+$/,message:'Invalid email'},
+                      onBlur: e => checkEmail(e.target.value),
+                    })} />
                 </div>
                 {errors.email && <p className="text-[#BA1A1A] text-xs mt-1">{errors.email.message}</p>}
+                {emailStatus?.message && !errors.email && (
+                  <p className={`text-xs mt-1 flex items-center gap-1 ${emailStatus.validFormat && emailStatus.domainReachable && emailStatus.available ? 'text-emerald-700' : 'text-[#BA1A1A]'}`}>
+                    {emailStatus.validFormat && emailStatus.domainReachable && emailStatus.available
+                      ? <CheckCircle className="w-3 h-3" />
+                      : <AlertCircle className="w-3 h-3" />}
+                    {emailStatus.message}
+                  </p>
+                )}
               </div>
 
               {/* Phone */}
@@ -78,7 +107,7 @@ export default function Register() {
                 <label className="label">Phone</label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#737686]" />
-                  <input id="phone" type="tel" placeholder="+91 9876543210" className="input pl-10"
+                  <input id="phone" type="tel" placeholder="+919876543210" className="input pl-10"
                     {...register('phone')} />
                 </div>
               </div>

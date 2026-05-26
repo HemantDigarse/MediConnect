@@ -4,6 +4,9 @@ import { useSelector } from 'react-redux'
 export default function ProtectedRoute({ children, roles }) {
   const { user } = useSelector(state => state.auth)
   if (!user) return <Navigate to="/login" replace />
+  if (user.role !== 'ADMIN' && !user.isVerified) {
+    return <Navigate to="/verify-email" replace state={{ email: user.email }} />
+  }
   if (roles && !roles.includes(user.role)) {
     if (user.role === 'DOCTOR')   return <Navigate to="/doctor/dashboard" replace />
     if (user.role === 'ADMIN')    return <Navigate to="/admin" replace />

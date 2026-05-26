@@ -1,6 +1,11 @@
 package com.mediconnect.service;
 
-import com.mediconnect.dto.auth.*;
+import com.mediconnect.dto.auth.AuthResponse;
+import com.mediconnect.dto.auth.EmailValidationResponse;
+import com.mediconnect.dto.auth.LoginRequest;
+import com.mediconnect.dto.auth.OtpVerifyRequest;
+import com.mediconnect.dto.auth.RegisterRequest;
+import com.mediconnect.dto.auth.ResetPasswordRequest;
 import com.mediconnect.entity.Doctor;
 import com.mediconnect.entity.User;
 import com.mediconnect.exception.BadRequestException;
@@ -10,18 +15,16 @@ import com.mediconnect.repository.DoctorRepository;
 import com.mediconnect.repository.UserRepository;
 import com.mediconnect.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -33,6 +36,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final TokenStoreService tokenStore;
     private final EmailService emailService;
+    private final EmailValidationService emailValidationService;
     private final org.springframework.core.env.Environment environment;
 
     private static final String REFRESH_TOKEN_PREFIX = "refresh:";
@@ -43,43 +47,49 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+        String email = emailValidationService.normalize(request.getEmail());
+        EmailValidationResponse emailValidation = emailValidationService.validate(email);
+        if (!emailValidation.isValidFormat() || !emailValidation.isDomainReachable()) {
+            throw new BadRequestException(emailValidation.getMessage());
+        }
+        if (!emailValidation.isAvailable()) {
             throw new BadRequestException("Email already registered");
         }
 
         User user = User.builder()
             .fullName(request.getFullName())
-            .email(request.getEmail())
-            .phone(request.getPhone())
+            .email(email)
+            .phone(normalizeOptional(request.getPhone()))
             .passwordHash(passwordEncoder.encode(request.getPassword()))
             .role(request.getRole() != null ? request.getRole() : User.Role.PATIENT)
-            .isVerified(isDevProfile())
+            .isVerified(false)
             .isActive(true)
             .build();
 
         user = userRepository.save(user);
 
         if (user.getRole() == User.Role.DOCTOR) {
-            if (request.getLicenseNumber() == null || request.getSpecialty() == null) {
+            String licenseNumber = normalizeOptional(request.getLicenseNumber());
+            String specialty = normalizeOptional(request.getSpecialty());
+            if (licenseNumber == null || specialty == null) {
                 throw new BadRequestException("Doctors must provide specialty and license number");
+            }
+            if (doctorRepository.existsByLicenseNumber(licenseNumber)) {
+                throw new BadRequestException("License number already registered");
             }
             Doctor doctor = Doctor.builder()
                 .user(user)
-                .specialty(request.getSpecialty())
+                .specialty(specialty)
                 .experienceYears(request.getExperienceYears() != null ? request.getExperienceYears() : 0)
                 .consultationFee(request.getConsultationFee() != null ? request.getConsultationFee() : java.math.BigDecimal.ZERO)
-                .licenseNumber(request.getLicenseNumber())
-                .bio(request.getBio())
-                .city(request.getCity())
+                .licenseNumber(licenseNumber)
+                .bio(normalizeOptional(request.getBio()))
+                .city(normalizeOptional(request.getCity()))
                 .build();
             doctorRepository.save(doctor);
         }
 
-        if (!isDevProfile()) {
-            sendOtp(user.getEmail());
-        } else {
-            log.info("📧 [DEV] Skipping OTP — user auto-verified: {}", user.getEmail());
-        }
+        sendOtp(user.getEmail());
 
         String accessToken = jwtUtil.generateAccessToken(user.getEmail(), user.getRole().name(), user.getId());
         String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
@@ -89,11 +99,16 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+        String email = emailValidationService.normalize(request.getEmail());
+        try {
+            authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, request.getPassword())
+            );
+        } catch (AuthenticationException ex) {
+            throw new UnauthorizedException("Invalid email or password");
+        }
 
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String accessToken = jwtUtil.generateAccessToken(user.getEmail(), user.getRole().name(), user.getId());
@@ -123,14 +138,15 @@ public class AuthService {
 
     @Transactional
     public void verifyOtp(OtpVerifyRequest request) {
-        String key = OTP_PREFIX + request.getEmail();
+        String email = emailValidationService.normalize(request.getEmail());
+        String key = OTP_PREFIX + email;
         String storedOtp = tokenStore.get(key);
 
         if (storedOtp == null || !storedOtp.equals(request.getOtp())) {
             throw new BadRequestException("Invalid or expired OTP");
         }
 
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         user.setIsVerified(true);
@@ -139,16 +155,30 @@ public class AuthService {
         tokenStore.delete(key);
     }
 
+    public void resendOtp(String rawEmail) {
+        String email = emailValidationService.normalize(rawEmail);
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (Boolean.TRUE.equals(user.getIsVerified())) {
+            throw new BadRequestException("Email is already verified");
+        }
+        sendOtp(email);
+    }
+
+    public EmailValidationResponse validateEmail(String email) {
+        return emailValidationService.validate(email);
+    }
+
     public String forgotPassword(String email) {
-        userRepository.findByEmail(email)
+        String normalizedEmail = emailValidationService.normalize(email);
+        userRepository.findByEmail(normalizedEmail)
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String resetToken = java.util.UUID.randomUUID().toString();
-        tokenStore.set(RESET_TOKEN_PREFIX + resetToken, email, 60, TimeUnit.MINUTES);
+        tokenStore.set(RESET_TOKEN_PREFIX + resetToken, normalizedEmail, 60, TimeUnit.MINUTES);
 
-        emailService.sendPasswordResetEmail(email, resetToken);
+        emailService.sendPasswordResetEmail(normalizedEmail, resetToken);
 
-        // In dev mode, return the token so the frontend can use it directly
         if (isDevProfile()) {
             return resetToken;
         }
@@ -195,5 +225,9 @@ public class AuthService {
 
     private boolean isDevProfile() {
         return java.util.Arrays.asList(environment.getActiveProfiles()).contains("dev");
+    }
+
+    private String normalizeOptional(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 }

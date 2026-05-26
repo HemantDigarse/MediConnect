@@ -15,6 +15,10 @@ export default function Login() {
   const onSubmit = async (data) => {
     const result = await dispatch(login(data))
     if (login.fulfilled.match(result)) {
+      if (!result.payload.isVerified && result.payload.role !== 'ADMIN') {
+        navigate('/verify-email', { state: { email: result.payload.email } })
+        return
+      }
       const role = result.payload.role
       if (role === 'DOCTOR') navigate('/doctor/dashboard')
       else if (role === 'ADMIN') navigate('/admin')

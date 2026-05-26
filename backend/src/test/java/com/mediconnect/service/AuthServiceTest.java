@@ -2,6 +2,7 @@ package com.mediconnect.service;
 
 import com.mediconnect.entity.User;
 import com.mediconnect.exception.BadRequestException;
+import com.mediconnect.repository.DoctorRepository;
 import com.mediconnect.repository.UserRepository;
 import com.mediconnect.security.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +12,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -25,11 +29,14 @@ import static org.mockito.Mockito.*;
 class AuthServiceTest {
 
     @Mock private UserRepository     userRepository;
+    @Mock private DoctorRepository   doctorRepository;
     @Mock private PasswordEncoder    passwordEncoder;
     @Mock private JwtUtil            jwtUtil;
-    @Mock private StringRedisTemplate redisTemplate;
+    @Mock private AuthenticationManager authenticationManager;
+    @Mock private TokenStoreService   tokenStore;
     @Mock private EmailService        emailService;
-    @Mock private SmsService          smsService;
+    @Mock private EmailValidationService emailValidationService;
+    @Mock private Environment         environment;
 
     @InjectMocks private AuthService authService;
 
@@ -50,7 +57,16 @@ class AuthServiceTest {
     @Test
     @DisplayName("Registration fails when email already exists")
     void register_shouldThrow_whenEmailAlreadyExists() {
-        when(userRepository.existsByEmail(anyString())).thenReturn(true);
+        when(emailValidationService.normalize("patient@test.com")).thenReturn("patient@test.com");
+        when(emailValidationService.validate("patient@test.com")).thenReturn(
+            com.mediconnect.dto.auth.EmailValidationResponse.builder()
+                .email("patient@test.com")
+                .validFormat(true)
+                .domainReachable(true)
+                .available(false)
+                .message("Email is already registered.")
+                .build()
+        );
 
         var request = new com.mediconnect.dto.auth.RegisterRequest();
         request.setEmail("patient@test.com");
@@ -69,8 +85,9 @@ class AuthServiceTest {
         request.setEmail("patient@test.com");
         request.setPassword("wrong-password");
 
-        when(userRepository.findByEmail("patient@test.com")).thenReturn(Optional.of(testUser));
-        when(passwordEncoder.matches("wrong-password", "hashed-password")).thenReturn(false);
+        when(emailValidationService.normalize("patient@test.com")).thenReturn("patient@test.com");
+        when(authenticationManager.authenticate(any()))
+            .thenThrow(new BadCredentialsException("Bad credentials"));
 
         assertThrows(com.mediconnect.exception.UnauthorizedException.class, () -> authService.login(request));
     }
@@ -82,13 +99,11 @@ class AuthServiceTest {
         request.setEmail("patient@test.com");
         request.setPassword("correct-password");
 
+        when(emailValidationService.normalize("patient@test.com")).thenReturn("patient@test.com");
+        when(authenticationManager.authenticate(any())).thenReturn(null);
         when(userRepository.findByEmail("patient@test.com")).thenReturn(Optional.of(testUser));
-        when(passwordEncoder.matches("correct-password", "hashed-password")).thenReturn(true);
         when(jwtUtil.generateAccessToken(anyString(), anyString(), any(java.util.UUID.class))).thenReturn("access-token");
         when(jwtUtil.generateRefreshToken(anyString())).thenReturn("refresh-token");
-
-        var ops = mock(org.springframework.data.redis.core.ValueOperations.class);
-        when(redisTemplate.opsForValue()).thenReturn(ops);
 
         var result = authService.login(request);
 
@@ -105,8 +120,9 @@ class AuthServiceTest {
         request.setEmail("patient@test.com");
         request.setPassword("correct-password");
 
-        when(userRepository.findByEmail("patient@test.com")).thenReturn(Optional.of(testUser));
-        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+        when(emailValidationService.normalize("patient@test.com")).thenReturn("patient@test.com");
+        when(authenticationManager.authenticate(any()))
+            .thenThrow(new DisabledException("User is disabled"));
 
         assertThrows(com.mediconnect.exception.UnauthorizedException.class, () -> authService.login(request));
     }
