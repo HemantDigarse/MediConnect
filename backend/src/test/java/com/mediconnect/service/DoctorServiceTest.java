@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
-import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -24,6 +23,7 @@ class DoctorServiceTest {
     @Mock private DoctorRepository doctorRepository;
     @Mock private com.mediconnect.repository.UserRepository userRepository;
     @Mock private com.mediconnect.repository.AvailabilitySlotRepository slotRepository;
+    @Mock private com.mediconnect.repository.ReviewRepository reviewRepository;
 
     @InjectMocks private DoctorService doctorService;
 
@@ -50,7 +50,8 @@ class DoctorServiceTest {
     @DisplayName("Doctor search returns paginated results")
     void searchDoctors_shouldReturnPagedResults() {
         Page<Doctor> mockPage = new PageImpl<>(List.of(doctor));
-        when(doctorRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(mockPage);
+        when(doctorRepository.searchDoctors(isNull(), isNull(), isNull(), isNull(), isNull(), any(Pageable.class)))
+            .thenReturn(mockPage);
 
         var result = doctorService.searchDoctors(null, null, null, null, null, PageRequest.of(0, 10));
 
@@ -62,7 +63,8 @@ class DoctorServiceTest {
     @DisplayName("Search with specialty filter returns correct results")
     void searchDoctors_shouldFilter_bySpecialty() {
         Page<Doctor> mockPage = new PageImpl<>(List.of(doctor));
-        when(doctorRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(mockPage);
+        when(doctorRepository.searchDoctors(eq("Dermatologist"), isNull(), isNull(), isNull(), isNull(), any(Pageable.class)))
+            .thenReturn(mockPage);
 
         var result = doctorService.searchDoctors("Dermatologist", null, null, null, null, PageRequest.of(0, 10));
 

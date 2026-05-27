@@ -1,10 +1,15 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 import Navbar from '../components/Navbar'
 import api from '../api/axiosInstance'
+import { logout } from '../store/slices/authSlice'
 import { Bot, Send, AlertTriangle, ClipboardList, ShieldCheck } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function MediConnectBot() {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState(null)
@@ -18,7 +23,13 @@ export default function MediConnectBot() {
       const res = await api.post('/bot/general-prescription', { message })
       setResponse(res.data.data)
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Bot could not respond')
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        dispatch(logout())
+        toast.error('Please sign in again to use MediConnect Bot.')
+        navigate('/login', { replace: true })
+      } else {
+        toast.error(err.response?.data?.message || 'Bot could not respond')
+      }
     } finally {
       setLoading(false)
     }

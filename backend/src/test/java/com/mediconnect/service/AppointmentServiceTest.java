@@ -61,6 +61,9 @@ class AppointmentServiceTest {
         slot.setId(slotId);
         slot.setDoctor(doctor);
         slot.setIsBooked(false);
+        slot.setSlotDate(java.time.LocalDate.now().plusDays(1));
+        slot.setStartTime(java.time.LocalTime.of(10, 0));
+        slot.setEndTime(java.time.LocalTime.of(10, 30));
     }
 
     @Test
@@ -68,9 +71,11 @@ class AppointmentServiceTest {
     void bookAppointment_shouldThrow_whenSlotAlreadyBooked() {
         slot.setIsBooked(true);
         when(userRepository.findById(patientId)).thenReturn(Optional.of(patient));
+        when(doctorRepository.findById(doctorId)).thenReturn(Optional.of(doctor));
         when(slotRepository.findById(slotId)).thenReturn(Optional.of(slot));
 
         var req = new com.mediconnect.dto.appointment.BookAppointmentRequest();
+        req.setDoctorId(doctorId);
         req.setSlotId(slotId);
 
         assertThrows(BadRequestException.class, () -> appointmentService.bookAppointment(patientId, req));
@@ -81,6 +86,7 @@ class AppointmentServiceTest {
     @DisplayName("Booking creates Razorpay order when slot is available")
     void bookAppointment_shouldCreateOrder_whenSlotAvailable() {
         when(userRepository.findById(patientId)).thenReturn(Optional.of(patient));
+        when(doctorRepository.findById(doctorId)).thenReturn(Optional.of(doctor));
         when(slotRepository.findById(slotId)).thenReturn(Optional.of(slot));
         when(razorpayService.createOrder(any(), anyString())).thenReturn("order_test_123");
         when(appointmentRepository.save(any())).thenAnswer(inv -> {
@@ -90,6 +96,7 @@ class AppointmentServiceTest {
         });
 
         var req = new com.mediconnect.dto.appointment.BookAppointmentRequest();
+        req.setDoctorId(doctorId);
         req.setSlotId(slotId);
 
         var result = appointmentService.bookAppointment(patientId, req);
@@ -107,7 +114,10 @@ class AppointmentServiceTest {
         appointment.setId(UUID.randomUUID());
         appointment.setRazorpayOrderId("order_123");
         appointment.setStatus(Appointment.Status.PENDING);
+        appointment.setPaymentStatus(Appointment.PaymentStatus.PENDING);
         appointment.setPatient(patient);
+        appointment.setDoctor(doctor);
+        appointment.setSlot(slot);
 
         when(appointmentRepository.findById(any())).thenReturn(Optional.of(appointment));
         when(razorpayService.verifyPaymentSignature("order_123", "pay_456", "sig_789")).thenReturn(true);

@@ -21,7 +21,7 @@ public class RegisterRequest {
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
-    @Pattern(regexp = "^[+]?[0-9]{10,15}$", message = "Invalid phone number")
+    @Pattern(regexp = "^\\s*$|^[+]?[0-9]{10,15}$", message = "Invalid phone number")
     private String phone;
 
     private User.Role role = User.Role.PATIENT;
